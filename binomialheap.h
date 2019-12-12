@@ -155,7 +155,7 @@ int BinomialHeap<T, TLess>::BinomialTree_::getDegree(BinomialTree_* tree)
 template <typename T, class TLess>
 bool BinomialHeap<T, TLess>::BinomialTree_::isLess(T& first, T& second)
 {
-    TLess comp;
+    static TLess comp;
     return comp(first, second);
 }
 

@@ -129,7 +129,7 @@ typename ObliqueHeap<T, TLess>::Node_* ObliqueHeap<T, TLess>::Node_::meld(Obliqu
 template <typename T, class TLess>
 bool ObliqueHeap<T, TLess>::Node_::isLess(T& first, T& second)
 {
-    TLess comp;
+    static TLess comp;
     return comp(first, second);
 }
 

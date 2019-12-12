@@ -138,7 +138,7 @@ typename LeftistHeap<T, TLess>::Node_* LeftistHeap<T, TLess>::Node_::meld(Leftis
 template <typename T, class TLess>
 bool LeftistHeap<T, TLess>::Node_::isLess(T& first, T& second)
 {
-    TLess comp;
+    static TLess comp;
     return comp(first, second);
 }
 
