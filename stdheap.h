@@ -11,17 +11,17 @@ class STDHeap : public IHeap <T, TLess>
 public:
     STDHeap();
     STDHeap(T key);
-    virtual ~STDHeap();
+    ~STDHeap() override;
 
-    virtual void insert(T key);
-    virtual void meld(IHeap<int, TLess>& right);
+    void insert(T key) override;
+    void meld(IHeap<int, TLess>& right) override;
 
-    virtual T getMin();
-    virtual T extractMin();
+    T getMin() const override;
+    T extractMin() override;
 
-    virtual std::vector <T> toVector() const;
+    std::vector <T> toVector() const override;
 
-    virtual bool empty();
+    bool empty() const override;
 private:
     using mSetIter = typename std::multiset <T, TLess>::iterator;
     std::multiset <T, TLess> heap_;
@@ -50,20 +50,21 @@ void STDHeap<T, TLess>::insert(T key)
 template <typename T, class TLess>
 void STDHeap<T, TLess>::meld(IHeap <int, TLess>& right)
 {
-    STDHeap<T, TLess> *temp = dynamic_cast<STDHeap<T, TLess>*> (&right);
+    STDHeap<T, TLess> *temp = nullptr;
+    try{
+        temp = dynamic_cast<STDHeap<T, TLess>*> (&right);
+    } catch (const std::bad_cast &e){
+        std::cerr << e.what();
+    }
     if (this == temp){
         return;
     }
-    mSetIter it = temp->heap_.begin();
-    while (it != temp->heap_.end()){
-        this->insert(*it);
-        it++;
-    }
+    this->heap_.insert(temp->heap_.begin(), temp->heap_.end());
     temp->heap_.clear();
 }
 
 template <typename T, class TLess>
-T STDHeap<T, TLess>::getMin()
+T STDHeap<T, TLess>::getMin() const
 {
     if (this->empty()){
         throw "Request to an empty STDHeap";
@@ -83,9 +84,9 @@ T STDHeap<T, TLess>::extractMin()
 }
 
 template <typename T, class TLess>
-bool STDHeap<T, TLess>::empty()
+bool STDHeap<T, TLess>::empty() const
 {
-    return (heap_.size() ? false : true);
+    return heap_.empty();
 }
 
 template <typename T, class TLess>

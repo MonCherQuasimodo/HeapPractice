@@ -11,19 +11,19 @@ public:
     LeftistHeap();
     LeftistHeap(T key);
     LeftistHeap(const LeftistHeap<T, TLess>& right);
-    virtual ~LeftistHeap();
+    ~LeftistHeap() override;
 
     LeftistHeap<T, TLess> & operator=(const LeftistHeap<T, TLess>& right);
 
-    virtual void insert(T key);
-    virtual void meld(IHeap<int, TLess>& right);
+    void insert(T key) override;
+    void meld(IHeap<int, TLess>& right) override;
 
-    virtual T getMin();
-    virtual T extractMin();
+    T getMin() const override;
+    T extractMin() override;
 
-    virtual std::vector <T> toVector() const;
+    std::vector <T> toVector() const;
 
-    virtual bool empty();
+    bool empty() const override;
 private:
     struct Node_
     {
@@ -204,7 +204,12 @@ void LeftistHeap<T, TLess>::insert(T key)
 template <typename T, class TLess>
 void LeftistHeap<T, TLess>::meld(IHeap <int, TLess>& right_)
 {
-    LeftistHeap<T, TLess>* right = dynamic_cast<LeftistHeap<T, TLess>*> (&right_);
+    LeftistHeap<T, TLess>* right = nullptr;
+    try {
+        right = dynamic_cast<LeftistHeap<T, TLess>*> (&right_);
+    } catch (const std::bad_cast &e){
+        std::cerr << e.what();
+    }
     if (this == &right_){
         return;
     }
@@ -213,7 +218,7 @@ void LeftistHeap<T, TLess>::meld(IHeap <int, TLess>& right_)
 }
 
 template <typename T, class TLess>
-T LeftistHeap<T, TLess>::getMin()
+T LeftistHeap<T, TLess>::getMin() const
 {
     if (this->empty()){
         throw "Request to an empty heap";
@@ -241,9 +246,9 @@ T LeftistHeap<T, TLess>::extractMin()
 }
 
 template <typename T, class TLess>
-bool LeftistHeap<T, TLess>::empty()
+bool LeftistHeap<T, TLess>::empty() const
 {
-    return (this->root_ ? false : true);
+    return this->root_ == nullptr;
 }
 
 template <typename T, class TLess>

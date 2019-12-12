@@ -29,11 +29,11 @@ public:
     virtual void insert(T key) = 0;
     virtual void meld(IHeap& right) = 0;
 
-    virtual T getMin() = 0;
+    virtual T getMin() const = 0;
 
     virtual T extractMin() = 0;
     virtual std::vector <T> toVector() const = 0;
-    virtual bool empty() = 0;
+    virtual bool empty() const = 0;
 };
 
 #endif /* IHEAP_H */

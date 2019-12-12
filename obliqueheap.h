@@ -11,19 +11,19 @@ public:
     ObliqueHeap();
     ObliqueHeap(T key);
     ObliqueHeap(const ObliqueHeap<T, TLess>& right);
-    virtual ~ObliqueHeap();
+    ~ObliqueHeap() override;
 
     ObliqueHeap<T, TLess> & operator=(const ObliqueHeap<T, TLess>& right);
 
-    virtual void insert(T key);
-    virtual void meld(IHeap<int, TLess>& right);
+    virtual void insert(T key) override;
+    virtual void meld(IHeap<int, TLess>& right) override;
 
-    virtual T getMin();
-    virtual T extractMin();
+    virtual T getMin() const override;
+    virtual T extractMin() override;
 
     virtual std::vector <T> toVector() const;
 
-    virtual bool empty();
+    virtual bool empty() const override;
 private:
     struct Node_
     {
@@ -189,7 +189,12 @@ void ObliqueHeap<T, TLess>::insert(T key)
 template <typename T, class TLess>
 void ObliqueHeap<T, TLess>::meld(IHeap <int, TLess>& right_)
 {
-    ObliqueHeap<T, TLess>* right = dynamic_cast<ObliqueHeap<T, TLess>*> (&right_);
+    ObliqueHeap<T, TLess>* right = nullptr;
+    try{
+        right = dynamic_cast<ObliqueHeap<T, TLess>*> (&right_);
+    } catch (const std::bad_cast &e){
+        std::cerr << e.what();
+    }
     if (this == &right_){
         return;
     }
@@ -198,7 +203,7 @@ void ObliqueHeap<T, TLess>::meld(IHeap <int, TLess>& right_)
 }
 
 template <typename T, class TLess>
-T ObliqueHeap<T, TLess>::getMin()
+T ObliqueHeap<T, TLess>::getMin() const
 {
     if (this->empty()){
         throw "Request to an empty heap";
@@ -226,9 +231,9 @@ T ObliqueHeap<T, TLess>::extractMin()
 }
 
 template <typename T, class TLess>
-bool ObliqueHeap<T, TLess>::empty()
+bool ObliqueHeap<T, TLess>::empty() const
 {
-    return (this->root_ ? false : true);
+    return this->root_ == nullptr;
 }
 
 template <typename T, class TLess>

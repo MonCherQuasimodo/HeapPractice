@@ -10,8 +10,6 @@
 
 #include "test.h"
 
-
-
 int solve(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

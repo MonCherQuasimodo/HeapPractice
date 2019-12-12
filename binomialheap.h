@@ -12,19 +12,19 @@ public:
     BinomialHeap();
     BinomialHeap(T key);
     BinomialHeap(const BinomialHeap<T, TLess>& right);
-    virtual ~BinomialHeap();
+    ~BinomialHeap() override;
 
     BinomialHeap<T, TLess> & operator=(const BinomialHeap<T, TLess>& right);
 
-    virtual void insert(T key);
-    virtual void meld(IHeap<int, TLess>& right);
+    void insert(T key) override;
+    void meld(IHeap<int, TLess>& right) override;
 
-    virtual T getMin();
-    virtual T extractMin();
+    T getMin() const override;
+    T extractMin() override;
 
-    virtual std::vector <T> toVector() const;
+    std::vector <T> toVector() const;
 
-    virtual bool empty();
+    bool empty() const override;
 private:
     struct BinomialTree_
     {
@@ -210,7 +210,7 @@ BinomialHeap<T, TLess>& BinomialHeap<T, TLess>::operator=(const BinomialHeap<T, 
     return *this;
 }
 
-///____________________Virtual_methods___________________________///
+///_____________________methods___________________________///
 template <typename T, class TLess>
 void BinomialHeap<T, TLess>::insert(T key)
 {
@@ -221,7 +221,12 @@ void BinomialHeap<T, TLess>::insert(T key)
 template <typename T, class TLess>
 void BinomialHeap<T, TLess>::meld(IHeap <int, TLess>& right_)
 {
-    BinomialHeap<T, TLess>* right = dynamic_cast<BinomialHeap<T, TLess>*> (&right_);
+    BinomialHeap<T, TLess>* right = nullptr;
+    try {
+        right = dynamic_cast<BinomialHeap<T, TLess>*> (&right_);
+    } catch (const std::bad_cast &e){
+        std::cerr << e.what();
+    }
     if (this == right){
         return;
     }
@@ -241,7 +246,7 @@ void BinomialHeap<T, TLess>::meld(IHeap <int, TLess>& right_)
 }
 
 template <typename T, class TLess>
-T BinomialHeap<T, TLess>::getMin()
+T BinomialHeap<T, TLess>::getMin() const
 {
     if (this->empty()){
         throw "Request to an empty heap";
@@ -296,9 +301,9 @@ T BinomialHeap<T, TLess>::extractMin()
 }
 
 template <typename T, class TLess>
-bool BinomialHeap<T, TLess>::empty()
+bool BinomialHeap<T, TLess>::empty() const
 {
-    return (roots_.size() ? false : true);
+    return roots_.empty();
 }
 
 template <typename T, class TLess>
