@@ -2,10 +2,11 @@
 #define LeftistHeap_H
 
 #include "iheap.h"
+#include "obliqueheap.h"
 
 ///____________________Leftist_Heap______________________________///
 template <typename T, class TLess = IsLess<T>>
-class LeftistHeap : public IHeap <T, TLess>
+class LeftistHeap : public ObliqueHeap<T, TLess>
 {
 public:
     LeftistHeap();
@@ -14,109 +15,56 @@ public:
     ~LeftistHeap() override;
 
     LeftistHeap<T, TLess> & operator=(const LeftistHeap<T, TLess>& right);
-
-    void insert(T key) override;
-    void meld(IHeap<int, TLess>& right) override;
-
-    T getMin() const override;
-    T extractMin() override;
-
-    std::vector <T> toVector() const;
-
-    bool empty() const override;
-private:
-    struct Node_
+protected:
+    struct _Node : ObliqueHeap<T, TLess>::Node_
     {
-        T key;
-        Node_* left;
-        Node_* right;
         size_t dist;
 
-        Node_();
-        Node_(T key_);
-        Node_(const Node_& node);
-        Node_& operator=(const Node_& right);
-        ~Node_();
+        _Node();
+        _Node(T key_);
+        _Node(const _Node& node);
+        _Node& operator=(const _Node& right);
+        ~_Node();
 
-        static Node_* meld(Node_* first, Node_* second);
-        static bool isLess(T& first, T& second);
-        static size_t getDist(Node_* Node_);
+        static _Node* meld(_Node* first, _Node* second);
+        static size_t getDist(_Node* _Node);
     };
-    Node_* root_;
+    _Node* root_;
 };
 
 ////////////////////////////////////////////////////////////////////
-///____________________Struct_Node_______________________________///
+///____________________Struct__Node______________________________///
 ////////////////////////////////////////////////////////////////////
 
 ///____________________Constructor_Destructor____________________///
 template <typename T, class TLess>
-LeftistHeap<T, TLess>::Node_::Node_() :
-    left(nullptr),
-    right(nullptr),
-    dist(0)
+LeftistHeap<T, TLess>::_Node::_Node()
 {}
 
 template <typename T, class TLess>
-LeftistHeap<T, TLess>::Node_::Node_(T key_) :
-    key(key_),
-    left(nullptr),
-    right(nullptr),
+LeftistHeap<T, TLess>::_Node::_Node(T key_) :
     dist(1)
 {}
 
 template <typename T, class TLess>
-LeftistHeap<T, TLess>::Node_::Node_(const Node_& node) :
-    key(node.key),
-    left(nullptr),
-    right(nullptr),
+LeftistHeap<T, TLess>::_Node::_Node(const _Node& node) :
     dist(node.dist)
-{
-    if (node.left){
-        left = new Node_(*(node.left));
-    }
-    if (node.right){
-        right = new Node_(*(node.right));
-    }
-}
+{}
 
 template <typename T, class TLess>
-LeftistHeap<T, TLess>::Node_::~Node_()
-{
-    delete left;
-    delete right;
-    left = nullptr;
-    right = nullptr;
-};
+LeftistHeap<T, TLess>::_Node::~_Node()
+{}
 
 template <typename T, class TLess>
-typename LeftistHeap<T, TLess>::Node_& LeftistHeap<T, TLess>::Node_::operator=(const Node_& node)
+typename LeftistHeap<T, TLess>::_Node& LeftistHeap<T, TLess>::_Node::operator=(const _Node& node)
 {
-    if (this == &node) {
-        return *this;
-    }
-
-    delete left;
-    delete right;
-    left = nullptr;
-    right = nullptr;
-
-    this->key = node.key;
     this->dist = node.dist;
-
-    if (node.right){
-        this->right = new Node_(*node.right);
-    }
-    if (node.left){
-        this->left = new Node_(*node.left);
-    }
-    return *this;
 }
 
 ///____________________Other_methods_____________________________///
 template <typename T, class TLess>
-typename LeftistHeap<T, TLess>::Node_* LeftistHeap<T, TLess>::Node_::meld(LeftistHeap<T, TLess>::Node_* first,
-                                                                          LeftistHeap<T, TLess>::Node_* second)
+typename LeftistHeap<T, TLess>::_Node* LeftistHeap<T, TLess>::_Node::meld(LeftistHeap<T, TLess>::_Node* first,
+                                                                          LeftistHeap<T, TLess>::_Node* second)
 {
     if (first == nullptr){
         return second;
@@ -124,7 +72,7 @@ typename LeftistHeap<T, TLess>::Node_* LeftistHeap<T, TLess>::Node_::meld(Leftis
     if (second == nullptr){
         return first;
     }
-    if (Node_::isLess(second->key, first->key)){
+    if (_Node::isLess(second->key, first->key)){
         std::swap(first, second);
     }
     first->right = meld(first->right, second);
@@ -136,23 +84,16 @@ typename LeftistHeap<T, TLess>::Node_* LeftistHeap<T, TLess>::Node_::meld(Leftis
 }
 
 template <typename T, class TLess>
-bool LeftistHeap<T, TLess>::Node_::isLess(T& first, T& second)
-{
-    static TLess comp;
-    return comp(first, second);
-}
-
-template <typename T, class TLess>
-size_t LeftistHeap<T, TLess>::Node_::getDist(Node_* node)
+size_t LeftistHeap<T, TLess>::_Node::getDist(_Node* node)
 {
     return (node ? node->dist : 0);
 }
-
 ////////////////////////////////////////////////////////////////////
 ///____________________Class_LeftistHeap_________________________///
 ////////////////////////////////////////////////////////////////////
 
 ///____________________Constructor_Destructor____________________///
+
 template <typename T, class TLess>
 LeftistHeap<T, TLess>::LeftistHeap() :
     root_(nullptr)
@@ -160,7 +101,7 @@ LeftistHeap<T, TLess>::LeftistHeap() :
 
 template <typename T, class TLess>
 LeftistHeap<T, TLess>::LeftistHeap(T key) :
-    root_(new Node_(key))
+    root_(new _Node(key))
 {}
 
 template <typename T, class TLess>
@@ -175,7 +116,7 @@ LeftistHeap<T, TLess>::LeftistHeap(const LeftistHeap<T, TLess>& right) :
     root_(nullptr)
 {
     if (right.root_){
-        root_ = new Node_(*right.root_);
+        root_ = new _Node(*right.root_);
     }
 }
 
@@ -188,77 +129,9 @@ LeftistHeap<T, TLess>& LeftistHeap<T, TLess>::operator=(const LeftistHeap<T, TLe
     delete root_;
     root_ = nullptr;
     if (right.root_){
-        root_ = new Node_(*right.root_);
+        root_ = new _Node(*right.root_);
     }
     return *this;
 }
 
-///____________________Virtual_methods___________________________///
-template <typename T, class TLess>
-void LeftistHeap<T, TLess>::insert(T key)
-{
-    LeftistHeap<T, TLess>* add = new LeftistHeap(key);
-    this->meld(*add);
-}
-
-template <typename T, class TLess>
-void LeftistHeap<T, TLess>::meld(IHeap <int, TLess>& right_)
-{
-    LeftistHeap<T, TLess>* right = nullptr;
-    try {
-        right = dynamic_cast<LeftistHeap<T, TLess>*> (&right_);
-    } catch (const std::bad_cast &e){
-        std::cerr << e.what();
-    }
-    if (this == &right_){
-        return;
-    }
-    this->root_ = Node_::meld(this->root_, right->root_);
-    right->root_ = nullptr;
-}
-
-template <typename T, class TLess>
-T LeftistHeap<T, TLess>::getMin() const
-{
-    if (this->empty()){
-        throw "Request to an empty heap";
-    }
-    return this->root_->key;
-}
-
-template <typename T, class TLess>
-T LeftistHeap<T, TLess>::extractMin()
-{
-    if (this->empty()){
-        throw "Request to an empty heap";
-    }
-
-    T minValue = this->getMin();
-    Node_* left = this->root_->left;
-    Node_* right = this->root_->right;
-
-    this->root_->left = nullptr;
-    this->root_->right = nullptr;
-    delete this->root_;
-    this->root_ = Node_::meld(left, right);
-
-    return minValue;
-}
-
-template <typename T, class TLess>
-bool LeftistHeap<T, TLess>::empty() const
-{
-    return this->root_ == nullptr;
-}
-
-template <typename T, class TLess>
-std::vector <T> LeftistHeap<T, TLess>::toVector() const
-{
-    std::vector <T> ret;
-    LeftistHeap<T, TLess> temp = *this;
-    while(!temp.empty()){
-        ret.push_back(temp.extractMin());
-    }
-    return ret;
-}
 #endif /* LeftistHeap_H */
